@@ -82,6 +82,10 @@ class Page(object):
 
 
 class Server(object):
+    allowed_file_extensions = [
+        'html', 'svg', 'pug', 'tpl',
+    ]
+
     def __init__(self, path):
         self.path = path
         self.meta = load_meta(self.path, {})
@@ -94,10 +98,8 @@ class Server(object):
 
     def _index(self):
         posts = []
-        self._add_contents('html', posts)
-        self._add_contents('svg', posts)
-        self._add_contents('pug', posts)
-        self._add_contents('tpl', posts)
+        for each_ext in self.allowed_file_extensions:
+            self._add_contents(each_ext, posts)
         posts.sort(key=lambda x: x.path)
         return bottle.template('index', posts=posts)
 
@@ -110,7 +112,7 @@ class Server(object):
         page = Page(pathlib.Path(filepath), self.path, meta=self.meta)
         return page.content
 
-    def run(self, host='localhost', port='5500', **kwargs):
+    def run(self, **kwargs):
         server = livereload.Server(self.app)
         server.watch(self.path)
-        server.serve(host=host, port=port, **kwargs)
+        server.serve(**kwargs)
