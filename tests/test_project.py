@@ -15,7 +15,7 @@ def project():
 
 @pytest.fixture(scope='module')
 def app(project):
-    return TestApp(project.app)
+    return TestApp(project.server.app)
 
 
 def test_index(app):

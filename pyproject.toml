@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "designed_with_web"
+name = "weblustrator"
 version = "0.1.0"
 description = "Generate illustrations using web technologies, such as svg, css, and javascript."
 authors = ["RCJacH"]
