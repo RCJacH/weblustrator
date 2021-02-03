@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "designed_with_web"
+version = "0.1.0"
+description = "Generate illustrations using web technologies, such as svg, css, and javascript."
+authors = ["RCJacH"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Pillow = "^8.1.0"
+pyppeteer = "^0.2.5"
+Jinja2 = "^2.11.3"
+livereload = "^2.6.3"
+bottle = "^0.12.19"
+python-frontmatter = "^0.5.0"
+pypugjs = "^5.9.8"
+PyYAML = "^5.4.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.2"
+pytest-cov = "^2.11.1"
+flake8 = "^3.8.4"
+flake8-pytest = "^1.3"
+flake8-pytest-style = "^1.3.0"
+flake8-docstrings = "^1.5.0"
+wemake-python-styleguide = "^0.14.1"
+WebTest = "^2.0.35"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
