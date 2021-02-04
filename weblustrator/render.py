@@ -4,6 +4,8 @@ import socket
 
 import pyppeteer
 
+from weblustrator.page import Page
+
 
 class Photographer(object):
     def __init__(self, path, host, port):
@@ -13,6 +15,13 @@ class Photographer(object):
         self._browser = None
 
     def __call__(self, *args, **kwargs):
+        """Render each file from input glob pattern to images.
+
+        Raises
+        ------
+        ConnectionError
+            The web server must be running to render.
+        """
         if not self._is_server_online():
             raise ConnectionError('Server not started.')
 
@@ -27,6 +36,13 @@ class Photographer(object):
 
     @property
     async def browser(self):
+        """Return the browser instance to take screenshots with.
+
+        Returns
+        -------
+        [pyppeteer.Browser]
+            [description]
+        """
         if not self._browser:
             self._browser = await pyppeteer.launch(headless=False)
         return self._browser
@@ -50,6 +66,19 @@ class Photographer(object):
         await page.screenshot(path=render_to, omitBackground=True, **kwargs)
 
     def render(self, path, render_to=None, ext='png', **kwargs):
+        """Render a designated url to a target raster image file.
+
+        Parameters
+        ----------
+        path : [str, Pathlike]
+            The relative link to the url.
+        render_to : [str, Pathlike], optional
+            The target location to save the render result. If a folder,
+            create a file with the same name as the filename from path.
+        ext : str, optional
+            The extension of the target file, by default 'png', ignored
+            if provided in render_to.
+        """
         url = fr'{self.host}:{self.port}/{path.as_posix()}'
         path = pathlib.Path(path)
         if render_to:
@@ -59,6 +88,16 @@ class Photographer(object):
         else:
             render_to = self.path / path.with_suffix(f'.{ext}')
 
+        page = Page(path, self.path)
+        page.parse(meta_only=True)
+        width = kwargs.pop('width', page.meta.get('width', 800))
+        height = kwargs.pop('height', page.meta.get('height', 600))
         asyncio.get_event_loop().run_until_complete(
-            self._screenshot(url, render_to, **kwargs),
+            self._screenshot(
+                url,
+                render_to,
+                width=width,
+                height=height,
+                **kwargs,
+            ),
         )
