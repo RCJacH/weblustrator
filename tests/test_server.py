@@ -3,19 +3,19 @@ import pathlib
 import pytest
 from webtest import TestApp
 
-from weblustrator.project import Project
+from weblustrator.server import Server
 
 RESOURCE_PATH = pathlib.Path(__file__).parent / 'project'
 
 
 @pytest.fixture(scope='module')
-def project():
-    return Project(RESOURCE_PATH)
+def server():
+    return Server(RESOURCE_PATH)
 
 
 @pytest.fixture(scope='module')
-def app(project):
-    return TestApp(project.server.app)
+def app(server):
+    return TestApp(server.app)
 
 
 def test_index(app):
