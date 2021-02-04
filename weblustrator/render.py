@@ -50,7 +50,7 @@ class Photographer(object):
         await page.screenshot(path=render_to, omitBackground=True, **kwargs)
 
     def render(self, path, render_to=None, ext='png', **kwargs):
-        url = fr'{self.host}:{self.port}/{path}'
+        url = fr'{self.host}:{self.port}/{path.as_posix()}'
         path = pathlib.Path(path)
         if render_to:
             render_to = pathlib.Path(render_to)
