@@ -87,7 +87,7 @@ class Server(object):
     ]
 
     def __init__(self, path):
-        self.path = path
+        self.path = pathlib.Path(path)
         self.meta = load_meta(self.path, {})
         self.app = bottle.Bottle()
         self._route()
@@ -116,3 +116,6 @@ class Server(object):
         server = livereload.Server(self.app)
         server.watch(self.path)
         server.serve(**kwargs)
+
+    def shutdown(self):
+        self.app.shutdown()
