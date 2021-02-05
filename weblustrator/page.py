@@ -1,4 +1,5 @@
 import pathlib
+from typing import Type
 
 import bottle
 import frontmatter
@@ -57,6 +58,13 @@ class Page(object):
             self.parse()
         return self._content
 
+    @property
+    def content_parser(self):
+        try:
+            return getattr(self, f'_{self._ext}')
+        except AttributeError:
+            return None
+
     def parse(self, meta_only=False):
         """Parse the content of the file.
 
@@ -79,7 +87,13 @@ class Page(object):
 
         if meta_only:
             return
-        self._content = getattr(self, f'_{self._ext}')(post.content, template)
+
+        try:
+            self._content = self.content_parser(post.content, template)
+        except TypeError:
+            self._content = None
+        except bottle.TemplateError:
+            self._content = ''
 
     def _html(self, post, template):
         return template(post, **self.meta)

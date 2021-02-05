@@ -43,5 +43,5 @@ After chromium opens and closes for a screencap, the result will be saved to the
 
 - Host IP and port can be altered with `--host` and `--port` options, for example, `weblustrator serve --host 0.0.0.0 --port 8080` will locate the server at `0.0.0.0:8080`. A matching setting must be used for the rendering.
 - A `-p` or `--path` option is available to change the project location from your current shell directory.
-- `--width` and `--height` options can be used to change the viewport, or the canvas size for the rendering process.
-- Multiple inputs are allow rendering, input string are [glob patterns](https://en.wikipedia.org/wiki/Glob_%28programming%29).
+- `--canvas_size width height` options can be used to change the viewport width and height for the rendering process.
+- Multiple inputs are allow for rendering, input string are [glob patterns](https://en.wikipedia.org/wiki/Glob_%28programming%29).

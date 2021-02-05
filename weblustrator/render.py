@@ -47,24 +47,6 @@ class Photographer(object):
             self._browser = await pyppeteer.launch(headless=False)
         return self._browser
 
-    def _is_server_online(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex((self.host, self.port)) == 0
-
-    async def _screenshot(
-        self,
-        url,
-        render_to,
-        width,
-        height,
-        **kwargs,
-    ):
-        browser = await self.browser
-        page = await browser.newPage()
-        await page.goto(url)
-        await page.setViewport({'width': width, 'height': height})
-        await page.screenshot(path=render_to, omitBackground=True, **kwargs)
-
     def render(self, path, render_to=None, ext='png', **kwargs):
         """Render a designated url to a target raster image file.
 
@@ -89,15 +71,36 @@ class Photographer(object):
             render_to = self.path / path.with_suffix(f'.{ext}')
 
         page = Page(path, self.path)
+        if not page.content_parser:
+            return
+
         page.parse(meta_only=True)
-        width = kwargs.pop('width', page.meta.get('width', 800))
-        height = kwargs.pop('height', page.meta.get('height', 600))
+        canvas_size = page.meta.get('canvas_size', [800, 600])
+        for i, v in enumerate(kwargs.pop('canvas_size')):
+            canvas_size[i] = v
         asyncio.get_event_loop().run_until_complete(
             self._screenshot(
                 url,
                 render_to,
-                width=width,
-                height=height,
+                canvas_size=canvas_size,
                 **kwargs,
             ),
         )
+
+    def _is_server_online(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex((self.host, self.port)) == 0
+
+    async def _screenshot(
+        self,
+        url,
+        render_to,
+        canvas_size,
+        **kwargs,
+    ):
+        width, height = canvas_size
+        browser = await self.browser
+        page = await browser.newPage()
+        await page.goto(url)
+        await page.setViewport({'width': width, 'height': height})
+        await page.screenshot(path=render_to, omitBackground=True, **kwargs)

@@ -6,7 +6,7 @@ from weblustrator.render import Photographer
 from weblustrator.server import Server
 
 CONTEXT_SETTINGS = {
-    'help_option_names': ['-h', '--help']
+    'help_option_names': ['-h', '--help'],
 }
 
 
@@ -63,22 +63,15 @@ def serve(path, host, port):
     show_default=True,
 )
 @click.option(
-    '--width',
+    '--canvas_size',
     type=int,
-    default=800,
-    help='The width of the viewport.',
-)
-@click.option(
-    '--height',
-    type=int,
-    default=600,
-    help='The height of the viewport.',
+    nargs=2,
+    help='The width and height of the viewport.',
 )
 def render(
     url,
     path,
-    width,
-    height,
+    canvas_size,
     host,
     port,
 ):
@@ -87,4 +80,4 @@ def render(
         path = os.getcwd()
 
     photographer = Photographer(path, host=host, port=port)
-    photographer(*url, width=width, height=height)
+    photographer(*url, canvas_size=canvas_size)

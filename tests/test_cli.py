@@ -76,3 +76,44 @@ def test_render(
         expect_args = expect[i]
         expect_args[1] = PROJECT_PATH / expect_args[1]
         assert list(each_call.args) == expect_args
+
+
+@pytest.mark.parametrize(
+    'args, expect', [
+        pytest.param(
+            ['**/local.html'],
+            [[30, 20]],
+            id='size_from_frontmatter',
+        ),
+        pytest.param(
+            ['with_frontmatter/folder.pug', '--canvas_size', 400, 500],
+            [[400, 500]],
+            id='size_from_options',
+        ),
+        pytest.param(
+            ['**/with_frontmatter/*.*'],
+            [[60, 90], [30, 20]],
+            id='frontmatter_overrides_folder_config',
+        ),
+        pytest.param(
+            ['**/local.html', '--canvas_size', 32, 64],
+            [[32, 64]],
+            id='options_overrides_frontmatter',
+        ),
+    ])
+@mock.patch.object(Photographer, '_screenshot')
+def test_canvas_size(
+    render_screenshot,
+    args,
+    expect,
+    runner,
+):
+    args = ['render', '--path', PROJECT_PATH] + args
+    with mock.patch(
+        'weblustrator.render.Photographer._is_server_online',
+        return_value=True,
+    ):
+        runner.invoke(cli, args)
+    for i, each_call in enumerate(render_screenshot.call_args_list):
+        expect_canvas_size = expect[i]
+        assert each_call.kwargs['canvas_size'] == expect_canvas_size
