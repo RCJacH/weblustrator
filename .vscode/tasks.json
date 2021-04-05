@@ -6,7 +6,7 @@
         {
             "label": "serve",
             "type": "shell",
-            "command": "cd ${workspaceFolder}\\tests\\project && poetry run python -m weblustrator serve"
+            "command": "poetry run python -m weblustrator serve -p ${workspaceFolder}\\tests\\project"
         },
         {
             "label": "render",
