@@ -12,6 +12,11 @@
             "label": "render",
             "type": "shell",
             "command": "poetry run python -m weblustrator render ${file} --path ${workspaceFolder}\\tests\\project",
-        }
+        },
+        {
+            "label": "publish",
+            "type": "shell",
+            "command": "poetry publish --build"
+        },
     ]
 }
