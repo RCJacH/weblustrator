@@ -41,6 +41,7 @@ class Server(object):
 
     def _route(self):
         self.app.route('/', callback=self._index)
+        self.app.route('/static/<filepath:path>', callback=self._add_static)
         self.app.route('/<filepath:path>', callback=self._add_post)
 
     def _index(self):
@@ -58,3 +59,11 @@ class Server(object):
     def _add_post(self, filepath):
         page = Page(pathlib.Path(filepath), self.path, meta=self.meta)
         return page.content
+
+    def _add_static(self, filepath):
+        path = self.path / filepath
+        filename = path.name
+        if not path.exists():
+            path = self.path / 'static' / filename
+        folder = path.parent
+        return bottle.static_file(filename, root=f'{self.path / folder}')

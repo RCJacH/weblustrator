@@ -59,3 +59,17 @@ def test_tpl(app):
     assert resp.status == '200 OK'
     assert resp.content_type == 'text/html'
     assert 'Variable from Project Config' in resp
+
+
+def test_static(app):
+    resp = app.get('/static/style.css')
+    assert resp.status == '200 OK'
+    assert resp.content_type == 'text/css'
+    assert 'body' in resp
+
+
+def test_default_static(app):
+    resp = app.get('/static/default.css')
+    assert resp.status == '200 OK'
+    assert resp.content_type == 'text/css'
+    assert 'height' in resp
