@@ -27,7 +27,7 @@ class Photographer(object):
 
         query = []
         for arg in args:
-            page_file = self.path.glob(arg).sort()
+            page_file = sorted(list(self.path.glob(arg)))
             query += page_file
 
         for each_page in query:

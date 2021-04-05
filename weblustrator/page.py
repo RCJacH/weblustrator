@@ -36,6 +36,8 @@ class Page(object):
         path = pathlib.Path(file_path).resolve()
         filepath = project_path / path
         relative_path = pathlib.Path(filepath).relative_to(project_path)
+        if meta is None:
+            meta = {}
         self.path = relative_path
         self._filepath = filepath
         self._ext = self.path.suffix[1:]
