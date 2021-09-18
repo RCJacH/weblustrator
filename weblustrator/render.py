@@ -96,7 +96,7 @@ class Photographer(object):
 
         page.parse(meta_only=True)
         canvas_size = page.meta.get('canvas_size', [800, 600])
-        for i, v in enumerate(kwargs.pop('canvas_size')):
+        for i, v in enumerate(kwargs.pop('canvas_size', ())):
             canvas_size[i] = v
         asyncio.get_event_loop().run_until_complete(
             self._screenshot(

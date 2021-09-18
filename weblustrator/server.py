@@ -4,6 +4,7 @@ import bottle
 import livereload
 
 from weblustrator.page import Page
+from weblustrator.render import Photographer
 from weblustrator.utils import load_meta
 
 VIEWS_PATH = pathlib.Path(__file__).parent / 'views'
@@ -33,6 +34,8 @@ class Server(object):
         """Bring the server online, with live reload."""
         server = livereload.Server(self.app)
         server.watch(self.path)
+        self.host = kwargs.get('host', 'localhost')
+        self.port = kwargs.get('port', 8080)
         server.serve(**kwargs)
 
     def shutdown(self):
@@ -43,6 +46,11 @@ class Server(object):
         self.app.route('/', callback=self._index)
         self.app.route('/static/<filepath:path>', callback=self._add_static)
         self.app.route('/<filepath:path>', callback=self._add_post)
+        self.app.route(
+            '/render/<filepath:path>',
+            method='POST',
+            callback=self._render,
+        )
 
     def _index(self):
         posts = []
@@ -67,3 +75,10 @@ class Server(object):
             path = self.path / 'static' / filename
         folder = path.parent
         return bottle.static_file(filename, root=f'{self.path / folder}')
+
+    def _render(self, filepath):
+        abs_path = self.path / filepath
+        photographer = Photographer(
+            abs_path.parent, host=self.host, port=self.port,
+        )
+        photographer.render(pathlib.Path(filepath), self.path)
