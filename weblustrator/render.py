@@ -47,6 +47,26 @@ class Photographer(object):
             self._browser = await pyppeteer.launch(headless=False)
         return self._browser
 
+    def render_from_cli(self, *args, **kwargs):
+        """Render each file from command line glob pattern to images.
+
+        Raises
+        ------
+        ConnectionError
+            The web server must be running to render.
+        """
+        if not self._is_server_online():
+            raise ConnectionError('Server not started.')
+
+        query = []
+        for arg in args:
+            page_file = sorted(self.path.glob(arg))
+            query += page_file
+
+        for each_page in query:
+            relative_path = each_page.relative_to(self.path)
+            self.render(relative_path, **kwargs)
+
     def render(self, path, render_to=None, ext='png', **kwargs):
         """Render a designated url to a target raster image file.
 
@@ -65,7 +85,7 @@ class Photographer(object):
         path = pathlib.Path(path)
         if render_to:
             render_to = pathlib.Path(render_to)
-            if render_to.is_path():
+            if render_to.is_dir():
                 render_to = render_to / path.with_suffix(f'.{ext}').name
         else:
             render_to = self.path / path.with_suffix(f'.{ext}')

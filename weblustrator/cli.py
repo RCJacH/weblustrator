@@ -80,4 +80,4 @@ def render(
         path = os.getcwd()
 
     photographer = Photographer(path, host=host, port=port)
-    photographer(*url, canvas_size=canvas_size)
+    photographer.render_from_cli(*url, canvas_size=canvas_size)
