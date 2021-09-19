@@ -12,7 +12,7 @@
     % for post in posts:
     <ul>
         <li>
-          <button onclick="render_page('{{ post.path }}')">Render</button>
+          <button onclick="render_page('{{ post.path.as_posix() }}')">Render</button>
           <a href="{{ post.path }}">{{ post.path }}</a>
         </li>
     </ul>

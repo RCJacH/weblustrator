@@ -79,6 +79,6 @@ class Server(object):
     def _render(self, filepath):
         abs_path = self.path / filepath
         photographer = Photographer(
-            abs_path.parent, host=self.host, port=self.port,
+            self.path, host=self.host, port=self.port,
         )
-        photographer.render(pathlib.Path(filepath), self.path)
+        photographer.render(pathlib.Path(filepath), abs_path.parent)
