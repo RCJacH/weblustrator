@@ -12,6 +12,7 @@ class Photographer(object):
         self.path = pathlib.Path(path)
         self.host = host
         self.port = port
+        self._loop = None
         self._browser = None
 
     def __call__(self, *args, **kwargs):
@@ -25,14 +26,17 @@ class Photographer(object):
         if not self._is_server_online():
             raise ConnectionError('Server not started.')
 
-        query = []
-        for arg in args:
-            page_file = sorted(list(self.path.glob(arg)))
-            query += page_file
+        query = args
+        if kwargs.get('from_cli'):
+            query = []
+            for arg in args:
+                query.extend(sorted(self.path.glob(arg)))
 
         for each_page in query:
-            relative_path = each_page.relative_to(self.path)
-            self.render(relative_path, **kwargs)
+            path = pathlib.Path(each_page)
+            if path.is_absolute():
+                path = path.relative_to(self.path)
+            self.render(path, **kwargs)
 
     @property
     async def browser(self):
@@ -47,25 +51,19 @@ class Photographer(object):
             self._browser = await pyppeteer.launch(headless=False)
         return self._browser
 
-    def render_from_cli(self, *args, **kwargs):
-        """Render each file from command line glob pattern to images.
+    @property
+    def loop(self):
+        """Return the async loop associated with this instance."""
+        if not self._loop or self._loop.is_closed():
+            try:
+                self._loop = asyncio.get_event_loop()
+            except RuntimeError:
+                self._loop = asyncio.new_event_loop()
+        return self._loop
 
-        Raises
-        ------
-        ConnectionError
-            The web server must be running to render.
-        """
-        if not self._is_server_online():
-            raise ConnectionError('Server not started.')
-
-        query = []
-        for arg in args:
-            page_file = sorted(self.path.glob(arg))
-            query += page_file
-
-        for each_page in query:
-            relative_path = each_page.relative_to(self.path)
-            self.render(relative_path, **kwargs)
+    def close(self):
+        """Close the opened browser of this instance."""
+        self.loop.run_until_complete(self._close())
 
     def render(self, path, render_to=None, ext='png', **kwargs):
         """Render a designated url to a target raster image file.
@@ -98,7 +96,7 @@ class Photographer(object):
         canvas_size = page.meta.get('canvas_size', [800, 600])
         for i, v in enumerate(kwargs.pop('canvas_size', ())):
             canvas_size[i] = v
-        asyncio.get_event_loop().run_until_complete(
+        self.loop.run_until_complete(
             self._screenshot(
                 url,
                 render_to,
@@ -106,6 +104,10 @@ class Photographer(object):
                 **kwargs,
             ),
         )
+
+    async def _close(self):
+        await self._browser.close()
+        self._browser = None
 
     def _is_server_online(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -121,6 +123,6 @@ class Photographer(object):
         width, height = canvas_size
         browser = await self.browser
         page = await browser.newPage()
-        await page.goto(url)
         await page.setViewport({'width': width, 'height': height})
+        await page.goto(url)
         await page.screenshot(path=render_to, omitBackground=True, **kwargs)

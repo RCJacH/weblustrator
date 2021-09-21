@@ -2,10 +2,13 @@ import pathlib
 
 import bottle
 import livereload
+import nest_asyncio
 
 from weblustrator.page import Page
 from weblustrator.render import Photographer
 from weblustrator.utils import load_meta
+
+nest_asyncio.apply()
 
 VIEWS_PATH = pathlib.Path(__file__).parent / 'views'
 bottle.TEMPLATE_PATH.insert(0, VIEWS_PATH)
@@ -77,8 +80,6 @@ class Server(object):
         return bottle.static_file(filename, root=f'{self.path / folder}')
 
     def _render(self, filepath):
-        abs_path = self.path / filepath
-        photographer = Photographer(
-            self.path, host=self.host, port=self.port,
-        )
-        photographer.render(pathlib.Path(filepath), abs_path.parent)
+        photographer = Photographer(self.path, self.host, self.port)
+        photographer(filepath)
+        photographer.close()

@@ -79,5 +79,5 @@ def render(
     if not path:
         path = os.getcwd()
 
-    photographer = Photographer(path, host=host, port=port)
-    photographer.render_from_cli(*url, canvas_size=canvas_size)
+    photographer = Photographer(path, host, port)
+    photographer(*url, canvas_size=canvas_size, from_cli=True)
