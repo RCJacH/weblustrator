@@ -9,14 +9,14 @@
 <body>
   <main>
     <h1>List of Pages</h1>
-    % for post in posts:
     <ul>
+    % for post in posts:
         <li>
-          <button onclick="render_page('{{ post.path.as_posix() }}')">Render</button>
+          <button id="{{ post.path.as_posix().replace(r'/', '-') }}" onclick="render_page('{{ post.path.as_posix() }}')">Render</button>
           <a href="{{ post.path }}">{{ post.path }}</a>
         </li>
-    </ul>
     % end
+    </ul>
   </main>
   <script>
   function render_page(path) {
