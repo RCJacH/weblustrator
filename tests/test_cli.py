@@ -13,7 +13,11 @@ PROJECT_PATH = pathlib.Path(__file__).parent / 'project'
 
 @pytest.fixture()
 def runner():
-    return CliRunner()
+    with mock.patch(
+        'weblustrator.render.Photographer._is_server_online',
+        return_value=True,
+    ):
+        yield CliRunner()
 
 
 def test_run(runner):
@@ -66,11 +70,7 @@ def test_render(
 ):
     call_count = len(args)
     args = ['render', '--path', PROJECT_PATH] + args
-    with mock.patch(
-        'weblustrator.render.Photographer._is_server_online',
-        return_value=True,
-    ):
-        runner.invoke(cli, args)
+    runner.invoke(cli, args)
     assert render_screenshot.call_count == call_count
     for i, each_call in enumerate(render_screenshot.call_args_list):
         expect_args = expect[i]
@@ -109,11 +109,7 @@ def test_canvas_size(
     runner,
 ):
     args = ['render', '--path', PROJECT_PATH] + args
-    with mock.patch(
-        'weblustrator.render.Photographer._is_server_online',
-        return_value=True,
-    ):
-        runner.invoke(cli, args)
+    runner.invoke(cli, args)
     for i, each_call in enumerate(render_screenshot.call_args_list):
         expect_canvas_size = expect[i]
         assert each_call.kwargs['canvas_size'] == expect_canvas_size
