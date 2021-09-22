@@ -41,9 +41,9 @@ class Server(object):
         self.port = kwargs.get('port', 8080)
         server.serve(**kwargs)
 
-    def shutdown(self):
+    def close(self):
         """Shut the server down manually."""
-        self.app.shutdown()
+        self.app.close()
 
     def _route(self):
         self.app.route('/', callback=self._index)
