@@ -68,7 +68,10 @@ class Server(object):
             posts.append(page)
 
     def _add_post(self, filepath):
-        page = Page(pathlib.Path(filepath), self.path, meta=self.meta)
+        path = pathlib.Path(filepath)
+        if path.parent.name == 'static':
+            return self._add_static(path.parent.parent / path.name)
+        page = Page(path, self.path, meta=self.meta)
         return page.content
 
     def _add_static(self, filepath):
