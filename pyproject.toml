@@ -30,6 +30,7 @@ flake8-docstrings = "^1.5.0"
 wemake-python-styleguide = "^0.14.1"
 WebTest = "^2.0.35"
 pytest-mock = "^3.5.1"
+pytest-pyppeteer = "^0.2.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
