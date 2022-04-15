@@ -124,5 +124,5 @@ class Photographer(object):
         browser = await self.browser
         page = await browser.newPage()
         await page.setViewport({'width': width, 'height': height})
-        await page.goto(url)
+        await page.goto(url, options={'timeout': 0})
         await page.screenshot(path=render_to, omitBackground=True, **kwargs)
